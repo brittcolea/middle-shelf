@@ -1,0 +1,195 @@
+:root {
+  --paper: #f6f2ea;
+  --paper-2: #efe9dd;
+  --ink: #1b1815;
+  --ink-2: #4a433b;
+  --muted: #7a7064;
+  --rule: rgba(27, 24, 21, .22);
+  --gold: #c69a55;
+  --display: "DM Serif Display", Georgia, serif;
+  --serif: "Lora", Georgia, serif;
+  --top: 58px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--paper); color: var(--ink); font: 400 15px/1.5 var(--serif);
+  overflow: hidden; -webkit-text-size-adjust: 100%;
+}
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+.display, .logo-word, .arch-text {
+  font-family: var(--display); font-weight: 400;
+}
+.logo-word { letter-spacing: .01em; }
+
+/* ---------- Tabs ---------- */
+.top {
+  position: fixed; inset: 0 0 auto 0; height: var(--top); z-index: 10; background: var(--paper);
+  border-bottom: 1.5px solid var(--ink); display: flex; align-items: center;
+}
+.top::after { /* thin second rule, like the frame */
+  content: ""; position: absolute; left: 0; right: 0; bottom: -5px; border-bottom: 1px solid var(--ink);
+}
+.tabs { display: flex; align-items: center; gap: 2px; overflow-x: auto; padding: 0 10px; scrollbar-width: none; width: 100%; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: none; appearance: none; border: 0; background: none; cursor: pointer; white-space: nowrap;
+  font: 400 12.5px/1 var(--display);
+  letter-spacing: .08em; text-transform: uppercase; padding: 9px 11px; border-radius: 999px;
+}
+.tab[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.tab.home { padding: 6px 9px; }
+.tab.home svg { width: 22px; height: 22px; display: block; }
+.tgroup {
+  flex: none; font: italic 12px var(--serif); color: var(--muted); padding: 0 6px 0 12px; margin-left: 6px;
+  border-left: 1px solid var(--rule);
+}
+
+/* ---------- Pages (swipe sideways) ---------- */
+.track {
+  position: fixed; inset: calc(var(--top) + 5px) 0 0 0; display: flex; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
+}
+.track::-webkit-scrollbar { display: none; }
+.page {
+  flex: 0 0 100%; height: 100%; overflow-y: auto; scroll-snap-align: start; scroll-snap-stop: always;
+  overscroll-behavior-y: contain; padding-bottom: 40px;
+}
+.inner { max-width: 760px; margin: 0 auto; padding: 0 12px; }
+
+/* ---------- Art-deco frame (cocktail pages) ---------- */
+.frame { position: relative; border: 1.5px solid var(--ink); margin: 16px 0 10px; padding: 30px 10px; }
+.frame::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--ink); pointer-events: none; }
+.frame .c {
+  position: absolute; width: 26px; height: 26px; border: 1px solid var(--ink); z-index: 1;
+  background: radial-gradient(circle, var(--ink) 2.4px, transparent 2.9px) center / 100% 100% no-repeat, var(--paper);
+}
+.frame .tl { top: 6px; left: 6px; } .frame .tr { top: 6px; right: 6px; }
+.frame .bl { bottom: 6px; left: 6px; } .frame .br { bottom: 6px; right: 6px; }
+.frame .dots {
+  position: absolute; left: 50%; transform: translateX(-50%); width: min(46%, 260px); height: 6px;
+  background: radial-gradient(circle, var(--ink) 1.7px, transparent 2.1px) 0 0 / 12px 6px round no-repeat;
+}
+.frame .dots.t { top: 14px; } .frame .dots.b { bottom: 14px; }
+.sheet {
+  position: relative; border: 1.5px solid var(--ink); border-radius: 56px; padding: 26px 18px 30px;
+  background: var(--paper);
+}
+@media (min-width: 620px) { .frame { padding: 34px 16px; } .sheet { padding: 30px 34px 36px; border-radius: 80px; } }
+
+/* ---------- Minimal ornament (cover, shelf pages) ---------- */
+.orn { display: flex; align-items: center; gap: 10px; margin: 18px 0; }
+.orn::before, .orn::after { content: ""; flex: 1; border-top: 1px solid var(--ink); box-shadow: 0 3px 0 -2px var(--ink); height: 4px; }
+.orn i {
+  width: 96px; height: 6px; background: radial-gradient(circle, var(--ink) 1.7px, transparent 2.1px) 0 0 / 12px 6px round no-repeat;
+}
+
+/* ---------- Page header ---------- */
+.arch { display: block; width: min(100%, 420px); margin: 0 auto -18px; overflow: visible; }
+.scene { display: block; width: min(100%, 400px); margin: -10px auto 0; }
+.blurb { text-align: center; margin: 4px auto 14px; max-width: 46ch; font-style: italic; color: var(--ink-2); }
+.group-switch { display: flex; justify-content: center; gap: 6px; margin: 0 0 8px; font-size: 12.5px; color: var(--muted); }
+.group-switch button {
+  appearance: none; background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 10px; cursor: pointer;
+  font-size: 12.5px; color: var(--ink-2);
+}
+.group-switch button[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); background: var(--paper-2); }
+
+/* ---------- Drinks ---------- */
+.drinks { list-style: none; margin: 0; padding: 0; }
+.drink {
+  display: grid; gap: 3px 18px; padding: 16px 4px; border-top: 1px dashed var(--rule); cursor: pointer;
+  border-radius: 6px; transition: background .15s;
+}
+.drink:first-child { border-top: 0; }
+.drink:hover, .drink:focus-visible { background: var(--paper-2); outline: none; }
+.dn { font-family: var(--display); font-weight: 400; font-size: 25px; line-height: 1.05; letter-spacing: -.005em; }
+.house-mark {
+  display: inline-block; vertical-align: 4px; margin-left: 6px; padding: 3px 7px 2px; border: 1px solid var(--ink); border-radius: 999px;
+  font: 600 9.5px/1 var(--serif); letter-spacing: .14em; text-transform: uppercase;
+}
+.dd { margin: 2px 0 0; font-style: italic; color: var(--ink-2); }
+.di { margin: 2px 0 0; font-size: 14.5px; }
+.di .sep { color: var(--gold); padding: 0 4px; }
+.dm { margin: 4px 0 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.dm .cam { color: var(--gold); letter-spacing: 0; }
+@media (min-width: 620px) {
+  .drink { grid-template-columns: minmax(170px, 36%) 1fr; align-items: baseline; }
+  .dn { grid-row: span 4; }
+}
+
+/* ---------- Cover ---------- */
+.cover { text-align: center; }
+.logo { display: block; width: min(100%, 460px); margin: 6px auto 0; }
+.tagline { font: italic 17px/1.45 var(--serif); max-width: 32ch; margin: 10px auto 18px; color: var(--ink-2); }
+.choose { margin: 8px 0 4px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.choice { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
+.choice button {
+  appearance: none; cursor: pointer; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 999px;
+  padding: 10px 18px; font: 400 15px/1 var(--display);
+}
+.choice button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.contents { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; text-align: left; max-width: 520px; margin: 18px auto 0; }
+.contents h3 { grid-column: span 1; margin: 0 0 4px; font: italic 13px var(--serif); color: var(--muted); }
+.contents ul { list-style: none; margin: 0; padding: 0; }
+.contents li button {
+  appearance: none; background: none; border: 0; padding: 5px 0; cursor: pointer; width: 100%; text-align: left;
+  display: flex; gap: 6px; align-items: baseline; font: 600 16px var(--display);
+}
+.contents li button::after { content: ""; flex: 1; border-bottom: 1px dotted var(--ink-2); order: 1; }
+.contents li button span { order: 2; font: 13px var(--serif); color: var(--muted); }
+.swipe { margin: 22px 0 0; font: italic 13px var(--serif); color: var(--muted); }
+.status { font-size: 12px; color: var(--muted); margin-top: 10px; }
+.status .live::before { content: "●"; color: #6c9a52; margin-right: 6px; }
+.status .stale::before { content: "●"; color: var(--gold); margin-right: 6px; }
+.credit { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* ---------- Shelf pages ---------- */
+.intro { max-width: 58ch; margin: 6px auto 18px; color: var(--ink-2); text-align: center; }
+.bottles { list-style: none; margin: 0 auto; padding: 0; max-width: 620px; }
+.bottles li { padding: 12px 2px; border-top: 1px dashed var(--rule); }
+.bottles li:first-child { border-top: 0; }
+.bn { font: 400 19px/1.15 var(--display); }
+.bs { display: block; margin-top: 2px; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.bnote { display: block; margin-top: 2px; font-style: italic; color: var(--ink-2); font-size: 14.5px; }
+.last { margin-left: 8px; font: 600 9.5px/1 var(--serif); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); vertical-align: 3px; }
+
+/* ---------- Drink detail ---------- */
+dialog.detail {
+  width: min(560px, 100%); max-height: 92dvh; margin: auto auto 0; padding: 0; border: 1.5px solid var(--ink);
+  border-radius: 28px 28px 0 0; background: var(--paper); color: var(--ink); overflow: auto;
+}
+@media (min-width: 620px) { dialog.detail { margin: auto; border-radius: 28px; } }
+dialog.detail::backdrop { background: rgba(27, 24, 21, .45); }
+.d-art { aspect-ratio: 5 / 4; display: grid; place-items: center; border-bottom: 1px solid var(--ink); background: var(--paper-2); }
+.d-art img { width: 100%; height: 100%; object-fit: cover; }
+.d-art .glass-art { height: 88%; width: auto; }
+.d-body { padding: 18px 22px 26px; }
+.d-body .dn { font-size: 34px; }
+.spec { width: 100%; border-collapse: collapse; margin: 14px 0; }
+.spec td { padding: 7px 0; border-bottom: 1px dashed var(--rule); vertical-align: baseline; }
+.spec td.amt { width: 78px; white-space: nowrap; padding-right: 10px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; margin: 0 0 14px; font-size: 14px; }
+.facts dt { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.facts dd { margin: 0; }
+.close {
+  position: sticky; top: 10px; float: right; margin: 10px 10px -48px 0; z-index: 2; width: 38px; height: 38px; border-radius: 50%;
+  border: 1.5px solid var(--ink); background: var(--paper); font-size: 20px; line-height: 1; cursor: pointer;
+}
+.src { font-size: 13px; color: var(--muted); }
+.loading { text-align: center; padding: 30vh 0; font: italic 18px var(--serif); color: var(--muted); }
+
+/* ---------- Print: each page becomes a sheet ---------- */
+@media print {
+  @page { margin: 0.4in; }
+  body { overflow: visible; background: #fff; }
+  .top, .group-switch, .choice, .choose, .swipe, .status { display: none !important; }
+  .track { position: static; display: block; overflow: visible; }
+  .page { height: auto; overflow: visible; break-after: page; padding: 0; }
+  .drink { break-inside: avoid; }
+}
+
+.inote { color: var(--muted); font-style: italic; }
+.instr { margin: 0 0 14px; line-height: 1.55; }

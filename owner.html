@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f6f2ea">
+  <title>Middle Shelf · Back Bar</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f6f2ea'/><path d='M22 30 Q22 60 50 62 Q78 60 78 30 Z M50 62 L50 82 M34 86 Q50 80 66 86' fill='none' stroke='%231b1815' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/><rect x='10' y='88' width='80' height='6' fill='%231b1815'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lora:ital,wght@0,400..600;1,400..600&display=swap" rel="stylesheet">
+  <style>
+    :root { --paper: #f6f2ea; --paper-2: #efe9dd; --ink: #1b1815; --ink-2: #4a433b; --muted: #7a7064; --rule: rgba(27,24,21,.2); --gold: #c69a55;
+      --display: "Fraunces", Georgia, serif; --serif: "Lora", Georgia, serif; color-scheme: light; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 var(--serif); }
+    a { color: inherit; }
+    main { max-width: 1100px; margin: 0 auto; padding: 0 16px 40px; }
+    .disp { font-family: var(--display); font-weight: 400; }
+    .bar-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 14px; padding: 28px 0 14px; border-bottom: 1.5px solid var(--ink); box-shadow: 0 5px 0 -4px var(--ink); }
+    .bar-head h1 { margin: 0; font-size: 40px; line-height: 1; }
+    .bar-head p { margin: 6px 0 0; color: var(--muted); font-size: 14px; font-style: italic; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn { display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px; text-decoration: none; font: 400 14px/1 var(--display); border: 1.5px solid var(--ink); background: var(--paper); }
+    .btn.primary { background: var(--ink); color: var(--paper); }
+    .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 20px 0 6px; }
+    .tile { border: 1px solid var(--ink); border-radius: 14px; padding: 12px 14px; background: var(--paper); }
+    .tile .n { font: 400 34px/1 var(--display); }
+    .tile .l { margin-top: 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+    .grid2 { display: grid; gap: 14px; grid-template-columns: 1fr; }
+    @media (min-width: 860px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+    .panel { border: 1.5px solid var(--ink); border-radius: 22px; padding: 18px 18px 14px; margin-top: 14px; background: var(--paper); }
+    .panel h2 { margin: 0 0 2px; font: 400 23px/1.2 var(--display); }
+    .panel .hint { margin: 0 0 10px; color: var(--muted); font-size: 13.5px; font-style: italic; }
+    .rows { list-style: none; margin: 0; padding: 0; }
+    .rows li { display: flex; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px dashed var(--rule); font-size: 15px; }
+    .rows li:first-child { border-top: 0; }
+    .rows .grow { flex: 1; min-width: 0; font-weight: 600; }
+    .rows .sub { display: block; color: var(--muted); font-size: 13px; font-weight: 400; margin-top: 1px; }
+    .pill { flex: none; font: 600 10px/1 var(--serif); letter-spacing: .12em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; border: 1px solid currentColor; }
+    .s-in { color: #3f6b2a; } .s-low { color: #9a6411; } .s-out { color: #a33a2a; } .s-wish { color: #2f5a8a; } .s-tried, .s-unknown { color: var(--muted); }
+    .miss { color: #a33a2a !important; }
+    .rate { flex: none; min-width: 40px; text-align: center; font: 700 13px/1 var(--serif); padding: 6px 7px; border-radius: 8px; color: #1b1815; border: 1px solid rgba(27,24,21,.25); }
+    .rate.none { background: transparent; color: var(--muted); }
+    .filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+    .chip { appearance: none; cursor: pointer; border: 1px solid var(--rule); background: var(--paper); padding: 6px 11px; border-radius: 999px; font: 13px var(--serif); color: var(--ink-2); }
+    .chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+    .scroll { overflow-x: auto; }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+    .tbl th { text-align: left; font: 600 10.5px/1 var(--serif); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 8px 6px; border-bottom: 1.5px solid var(--ink); cursor: pointer; white-space: nowrap; }
+    .tbl td { padding: 9px 6px; border-bottom: 1px dashed var(--rule); vertical-align: top; }
+    .tbl td.notes { font-size: 13.5px; font-style: italic; color: var(--ink-2); }
+    .tbl .muted { color: var(--muted); font-size: 12.5px; font-style: normal; }
+    @media (max-width: 640px) { .tbl .hide-sm { display: none; } }
+    .loading { text-align: center; padding: 80px 0; font: italic 18px var(--serif); color: var(--muted); }
+    footer { text-align: center; color: var(--muted); font-size: 12px; padding: 10px 16px 40px; }
+    footer .live::before { content: "●"; margin-right: 6px; color: #6c9a52; }
+    footer .stale::before { content: "●"; margin-right: 6px; color: var(--gold); }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="bar-head">
+      <div>
+        <h1 class="disp">Back Bar</h1>
+        <p>Stock, ratings and wishlist for Middle Shelf. Edit in the sheet; this page reads it live.</p>
+      </div>
+      <div class="actions">
+        <a class="btn primary" id="edit" href="#" target="_blank" rel="noopener">Edit in Google Sheets</a>
+        <a class="btn" href="./">Guest menu</a>
+        <a class="btn" href="print.html">QR card</a>
+      </div>
+    </div>
+    <div id="app"><p class="loading">Counting bottles…</p></div>
+  </main>
+  <footer><div id="status"></div></footer>
+  <script src="config.js?v=3"></script>
+  <script src="data/snapshot.js?v=3"></script>
+  <script src="assets/core.js?v=3"></script>
+  <script src="assets/owner.js?v=3"></script>
+</body>
+</html>
