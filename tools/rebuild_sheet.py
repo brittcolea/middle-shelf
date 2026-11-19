@@ -246,7 +246,7 @@ for d in cocktails:
     name = d["Name"]
     n = NEW.get(name)
     if n:
-        d.update({"Description": d.get("Description") or n["desc"], "Glass": n["glass"], "Garnish": n["garnish"],
+        d.update({"Glass": n["glass"], "Garnish": n["garnish"],
                   "Base spirit": n["base"], "Color": n["color"], "Codex family": n["family"]})
         if n.get("note"): d["Notes (not shown on menu)"] = n["note"]
         method, instr, rows = n["method"], n["instr"], n["rows"]
