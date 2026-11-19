@@ -115,7 +115,13 @@
   // "3/4 oz Bourbon" -> { amt: "¾ oz", item: "Bourbon" }
   const FRACS = { "1/2": "½", "1/4": "¼", "3/4": "¾", "1/3": "⅓", "2/3": "⅔", "1/8": "⅛" };
   const UNIT = "(?:oz|ounces?|dash(?:es)?|drops?|tsp|tbsp|barspoons?|bsp|cups?|ml|sprigs?|leaves|slices?|wheels?|wedges?|whole|pinch|parts?|rinse|top)";
-  const ING_RE = new RegExp("^((?:\\d+(?:\\.\\d+)?\\s*)?(?:\\d+/\\d+)?\\s*" + UNIT + "?\\.?)\\s+(.+)$", "i");
+  // "1 1/2" -> "1½", "3/4" -> "¾" (a fraction without a glyph stays as written)
+  function PRETTY(a) {
+    return String(a || "").trim()
+      .replace(/^(\d+)\s+(\d\/\d)$/, (m, w, f) => (FRACS[f] ? w + FRACS[f] : m))
+      .replace(/^(\d\/\d)$/, (f) => FRACS[f] || f);
+  }
+  const ING_RE =new RegExp("^((?:\\d+(?:\\.\\d+)?\\s*)?(?:\\d+/\\d+)?\\s*" + UNIT + "?\\.?)\\s+(.+)$", "i");
   function parseIngredient(line) {
     line = String(line).replace(/^[-•*]\s*/, "").trim();
     if (!line) return null;
@@ -126,8 +132,7 @@
       const m = line.match(ING_RE);
       if (m && /\d|dash|top|rinse|pinch/i.test(m[1])) { amt = m[1].trim(); item = m[2].trim(); }
     }
-    amt = amt.replace(/(\d+)\s+(\d\/\d)/, "$1$2").replace(/\b(\d\/\d)\b/g, (f) => FRACS[f] || f)
-             .replace(/(\d)([½¼¾⅓⅔⅛])/, "$1$2").replace(/^\.5\b/, "½").replace(/^\.75\b/, "¾").replace(/^\.25\b/, "¼");
+    amt = PRETTY(amt).replace(/^\.5\b/, "½").replace(/^\.75\b/, "¾").replace(/^\.25\b/, "¼");
     return { amt, item };
   }
   const ingredients = (text) =>
@@ -135,7 +140,6 @@
 
   // ---------- Recipe Ingredients (one row per ingredient) ----------
   // Returns { drinkName: [{ amt, item, note, type, bottle }] }
-  const PRETTY = (a) => String(a || "").replace(/(\d+)\s+(\d\/\d)/, "$1$2").replace(/\b(\d\/\d)\b/g, (f) => FRACS[f] || f);
   function recipes(rows, lists) {
     const pantryTypes = new Set((lists || []).filter((l) => /pantry/i.test(l.kind || "")).map((l) => l.ingredient));
     const map = {};

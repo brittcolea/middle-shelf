@@ -213,7 +213,7 @@ OVERRIDE_INSTR = {
     "Anders' Punch": "Combine everything in a punch bowl over a large block of ice and stir. Ladle into punch cups with a slice of fruit.",
     "Clover Club": "Shake everything without ice to whip the egg white, then shake again with ice. Double strain into a chilled coupe and garnish with raspberries.",
     "Mezcal Sour": "Shake everything without ice to whip the egg white, then shake again with ice. Double strain into a chilled coupe and add a few drops of Angostura on the foam.",
-    "Licor 43 Flip (working title)": "Shake everything without ice to emulsify the egg, then shake again with ice. Strain into a chilled coupe and grate nutmeg on top.",
+    "Licor 43 Flip": "Shake everything without ice to emulsify the egg, then shake again with ice. Strain into a chilled coupe and grate nutmeg on top.",
     "Whiskey Sour": "If using egg white, shake without ice first. Shake with ice, strain over a large cube, and garnish with a lemon wedge.",
 }
 def method_of(text):

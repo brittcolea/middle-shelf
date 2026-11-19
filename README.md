@@ -1,4 +1,4 @@
-# Middle Shelf
+# The Middle Shelf
 
 A home-bar menu that reads from a Google Sheet.
 

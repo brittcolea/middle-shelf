@@ -48,7 +48,7 @@
 
   function groupSwitch() {
     return `<div class="group-switch">Group by
-      <button data-g="family" aria-pressed="${grouping === "family"}">Codex family</button>
+      <button data-g="family" aria-pressed="${grouping === "family"}">Family</button>
       <button data-g="spirit" aria-pressed="${grouping === "spirit"}">Spirit</button></div>`;
   }
 
@@ -56,7 +56,7 @@
     return {
       id, tab: title, kind: "cocktails",
       html: `<div class="inner">${frame(
-        arch(title) + scene(sceneKey, title) + (blurb ? `<p class="blurb">${esc(blurb)}</p>` : "") + groupSwitch() +
+        arch(title) + scene(sceneKey, title) + (blurb ? `<p class="blurb">${esc(blurb)}</p>` : "") +
         `<ol class="drinks">${list.map(drinkHTML).join("")}</ol>`)}</div>`,
     };
   }
@@ -102,7 +102,7 @@
     pages[0].html = `<div class="inner cover">${orn}${logo()}
       ${S["tagline"] ? `<p class="tagline">${esc(S["tagline"])}</p>` : ""}
       <p class="choose">Browse the cocktails by</p>
-      <div class="choice"><button data-g="family" aria-pressed="${grouping === "family"}">Codex family</button><button data-g="spirit" aria-pressed="${grouping === "spirit"}">Spirit</button></div>
+      <div class="choice"><button data-g="family" aria-pressed="${grouping === "family"}">Family</button><button data-g="spirit" aria-pressed="${grouping === "spirit"}">Spirit</button></div>
       <div class="contents"><div><h3>Cocktails</h3><ul>${contents("cocktails")}</ul></div><div><h3>The Shelf</h3><ul>${contents("shelf")}</ul></div></div>
       <p class="swipe">Swipe sideways or use the tabs up top →</p>
       ${orn}
