@@ -27,7 +27,7 @@ async function tab(name) {
 }
 const pick = (o, keys) => Object.fromEntries(keys.filter((k) => k in o).map((k) => [k, o[k]]));
 
-const cocktails = (await tab("Cocktails")).filter((d) => /^yes$/i.test(d.on_menu));
+const cocktails = (await tab("Cocktails")).filter((d) => d.name); // all drinks, so the Full menu works offline too
 const names = new Set(cocktails.map((d) => d.name));
 const snap = {
   Cocktails: cocktails.map((d) => { const { my_rating, notes, ...rest } = d; return rest; }),

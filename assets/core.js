@@ -157,8 +157,9 @@
       if (unit === "splash" && !r.amount) amt = "splash";
       // The sheet's Status column: "Have it", "Sub" (pour a same-style bottle instead) or "Buy".
       const status = r.status || "", pour = r.pour || "";
+      const base = label;
       if (status === "Sub" && pour) label += " (subbed with " + pour + ")";
-      (map[r.drink] = map[r.drink] || []).push({ amt, item: label, note: r.note || "", type, bottle, status, pour });
+      (map[r.drink] = map[r.drink] || []).push({ amt, item: label, base, note: r.note || "", type, bottle, status, pour });
     });
     return map;
   }

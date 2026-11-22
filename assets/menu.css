@@ -193,3 +193,10 @@ dialog.detail::backdrop { background: rgba(27, 24, 21, .45); }
 
 .inote { color: var(--muted); font-style: italic; }
 .instr { margin: 0 0 14px; line-height: 1.55; }
+
+/* ---------- Missing / subbed ingredients ---------- */
+.tag { font: 600 9.5px/1 var(--serif); letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; vertical-align: 1px; }
+.tag.miss { color: #a33a2a; }
+.tag.sub { color: var(--gold); }
+.gift { margin: 6px 0 0; font-size: 13.5px; font-style: italic; color: #8a3a2a; }
+.full-note { max-width: 40ch; margin: 4px auto 0; font: italic 14px/1.45 var(--serif); color: var(--ink-2); }
