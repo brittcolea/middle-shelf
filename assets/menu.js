@@ -12,7 +12,7 @@
   const SHELF_ORDER = ["Whiskey", "Gin", "Rum", "Agave", "Brandy", "Vodka", "Liqueur", "Amaro & Aperitivo", "Vermouth & Fortified", "Bitters", "Other"];
   const spiritOf = (d) => (SPIRITS.find(([, re]) => re.test(d.base_spirit || "")) || ["Liqueurs & More"])[0];
 
-  const { data, source, at } = await MS.load(["Cocktails", "Recipe Ingredients", "Bottles", "Shelf Intros", "Settings", "Lists", "Styles"]);
+  const { data, source, at } = await MS.load(["Cocktails", "Recipe Ingredients", "Bottles", "Shelf Intros", "Settings", "Lists", "Styles", "Codex Recipes", "Codex Ingredients"]);
   // Styles tab: row order sets the order of types on the Shelf pages; Shelf note is the line under each type.
   const STYLES = (data.Styles || []).filter((s) => s.style);
   const styleIdx = (name) => { const i = STYLES.findIndex((s) => s.style === name); return i < 0 ? 999 : i; };
@@ -53,8 +53,16 @@
   };
   const sceneFor = (f) => { const i = FAM_NAMES.indexOf(f); return i >= 0 && CODEX[i] ? CODEX[i] : f; };
 
-  const ALL = data.Cocktails.filter((d) => d.name);
-  const REC = MS.recipes(data["Recipe Ingredients"], data.Lists);
+  // Codex Recipes rows with "Add to menu" checked join the menu, unless a drink by
+  // that name is already on the Cocktails tab (yours wins).
+  const normName = (s) => String(s || "").toLowerCase().replace(/ and /g, " & ").replace(/whisky/g, "whiskey").replace(/[^a-z0-9&]/g, "");
+  const mine = data.Cocktails.filter((d) => d.name);
+  const taken = new Set(mine.map((d) => normName(d.name)));
+  const codexAdds = (data["Codex Recipes"] || [])
+    .filter((d) => d.name && yes(d.add_to_menu) && !taken.has(normName(d.name)))
+    .map((d) => ({ ...d, on_menu: "Yes", source: d.source || "Cocktail Codex" }));
+  const ALL = mine.concat(codexAdds);
+  const REC = Object.assign(MS.recipes(data["Codex Ingredients"], data.Lists), MS.recipes(data["Recipe Ingredients"], data.Lists));
   const ingsOf = (d) => REC[d.name] || ingredients(d.ingredients);
   // What the sheet's Status column says we'd have to buy for a drink.
   const missingOf = (d) => [...new Set((REC[d.name] || []).filter((x) => x.status === "Buy").map((x) => x.pour || x.bottle || x.type))];
@@ -277,15 +285,18 @@
 
   // ---------- Drink detail ----------
   const dlg = $("dialog.detail");
+  // "Codex uses <brand>" notes on the Codex tabs are for the owner, not guests.
+  const guestNote = (n) => String(n || "").split(/;\s*/).filter((p) => p && !/^Codex uses /.test(p)).join("; ");
   function openDrink(d) {
     const img = photoUrl(d.photo_url);
-    const src = d.source || hostOf(d.source_url);
+    const by = d.created_by && !/^(classic|cocktail codex)$/i.test(d.created_by) ? d.created_by : "";
+    const src = [d.source || hostOf(d.source_url), by ? "(" + by + ")" : ""].filter(Boolean).join(" ");
     const facts = [["Glass", d.glass], ["Method", d.method], ["Garnish", d.garnish], ["Family", famOf(d) === "More" ? "" : famOf(d)]].filter((f) => f[1]);
     $(".d-content", dlg).innerHTML =
       `<div class="d-art">${img ? `<img alt="${esc(d.name)}" src="${esc(img)}">` : drinkArt(d, drinkColor(d))}</div>
       <div class="d-body"><div class="dn">${esc(d.name)}${yes(d.house_original) ? '<span class="house-mark">House</span>' : ""}${yes(d.favorite) ? '<span class="fav-mark">★ Favorite</span>' : ""}</div>
       ${d.description ? `<p class="dd">${esc(d.description)}</p>` : ""}
-      <table class="spec">${ingsOf(d).map((x) => `<tr><td class="amt">${esc(x.amt)}</td><td>${esc(ingName(x))}${x.note ? `<span class="inote">, ${esc(x.note)}</span>` : ""}${x.status === "Sub" && x.pour ? ` <span class="tag sub">subbed with ${esc(fullName(x.pour))}</span>` : ""}${x.status === "Buy" ? ' <span class="tag miss">missing</span>' : ""}</td></tr>`).join("")}</table>
+      <table class="spec">${ingsOf(d).map((x) => `<tr><td class="amt">${esc(x.amt)}</td><td>${esc(ingName(x))}${guestNote(x.note) ? `<span class="inote">, ${esc(guestNote(x.note))}</span>` : ""}${x.status === "Sub" && x.pour ? ` <span class="tag sub">subbed with ${esc(fullName(x.pour))}</span>` : ""}${x.status === "Buy" ? ' <span class="tag miss">missing</span>' : ""}</td></tr>`).join("")}</table>
       ${missingOf(d).length ? giftLine(missingOf(d)) : ""}
       ${d.instructions ? `<p class="instr">${esc(d.instructions)}</p>` : ""}
       ${facts.length ? `<dl class="facts">${facts.map((f) => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join("")}</dl>` : ""}

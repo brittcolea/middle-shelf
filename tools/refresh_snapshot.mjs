@@ -29,7 +29,13 @@ const pick = (o, keys) => Object.fromEntries(keys.filter((k) => k in o).map((k) 
 
 const cocktails = (await tab("Cocktails")).filter((d) => d.name); // all drinks, so the Full menu works offline too
 const names = new Set(cocktails.map((d) => d.name));
+// Only the Codex drinks checked "Add to menu" travel with the snapshot.
+const codex = (await tab("Codex Recipes")).filter((d) => d.name && /^true$/i.test(d.add_to_menu))
+  .map((d) => pick(d, ["add_to_menu", "name", "codex_family", "base_spirit", "method", "glass", "garnish", "instructions", "description", "color", "created_by", "source"]));
+const codexNames = new Set(codex.map((d) => d.name));
 const snap = {
+  "Codex Recipes": codex,
+  "Codex Ingredients": (await tab("Codex Ingredients")).filter((r) => codexNames.has(r.drink)),
   Cocktails: cocktails.map((d) => { const { my_rating, notes, ...rest } = d; return rest; }),
   "Recipe Ingredients": (await tab("Recipe Ingredients")).filter((r) => names.has(r.drink)),
   Bottles: (await tab("Bottles")).filter((b) => /^(in stock|low)$/i.test(b.status) && !/^no$/i.test(b.show_on_menu))
@@ -41,4 +47,4 @@ const snap = {
 };
 writeFileSync(new URL("../data/snapshot.js", import.meta.url),
   "// Saved copy of the menu, used when the live sheet can't be reached.\nwindow.MS_SNAPSHOT = " + JSON.stringify(snap) + ";\n");
-console.log(`snapshot: ${snap.Cocktails.length} drinks, ${snap["Recipe Ingredients"].length} ingredient rows, ${snap.Bottles.length} bottles`);
+console.log(`snapshot: ${snap.Cocktails.length} drinks + ${codex.length} from the Codex tab,${snap["Recipe Ingredients"].length} ingredient rows, ${snap.Bottles.length} bottles`);
