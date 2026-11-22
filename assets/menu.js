@@ -12,7 +12,7 @@
   const SHELF_ORDER = ["Whiskey", "Gin", "Rum", "Agave", "Brandy", "Vodka", "Liqueur", "Amaro & Aperitivo", "Vermouth & Fortified", "Bitters", "Other"];
   const spiritOf = (d) => (SPIRITS.find(([, re]) => re.test(d.base_spirit || "")) || ["Liqueurs & More"])[0];
 
-  const { data, source, at } = await MS.load(["Cocktails", "Recipe Ingredients", "Bottles", "Shelf Intros", "Settings", "Lists", "Styles", "Codex Recipes", "Codex Ingredients"]);
+  const { data, source, at } = await MS.load(["Cocktails", "Recipe Ingredients", "Bottles", "Shelf Intros", "Settings", "Lists", "Styles"]);
   // Styles tab: row order sets the order of types on the Shelf pages; Shelf note is the line under each type.
   const STYLES = (data.Styles || []).filter((s) => s.style);
   const styleIdx = (name) => { const i = STYLES.findIndex((s) => s.style === name); return i < 0 ? 999 : i; };
@@ -53,16 +53,11 @@
   };
   const sceneFor = (f) => { const i = FAM_NAMES.indexOf(f); return i >= 0 && CODEX[i] ? CODEX[i] : f; };
 
-  // Codex Recipes rows with "Add to menu" checked join the menu, unless a drink by
-  // that name is already on the Cocktails tab (yours wins).
-  const normName = (s) => String(s || "").toLowerCase().replace(/ and /g, " & ").replace(/whisky/g, "whiskey").replace(/[^a-z0-9&]/g, "");
-  const mine = data.Cocktails.filter((d) => d.name);
-  const taken = new Set(mine.map((d) => normName(d.name)));
-  const codexAdds = (data["Codex Recipes"] || [])
-    .filter((d) => d.name && yes(d.add_to_menu) && !taken.has(normName(d.name)))
-    .map((d) => ({ ...d, on_menu: "Yes", source: d.source || "Cocktail Codex" }));
-  const ALL = mine.concat(codexAdds);
-  const REC = Object.assign(MS.recipes(data["Codex Ingredients"], data.Lists), MS.recipes(data["Recipe Ingredients"], data.Lists));
+  const ALL = data.Cocktails.filter((d) => d.name);
+  const REC = MS.recipes(data["Recipe Ingredients"], data.Lists);
+  // Grapefruit (juice, soda, liqueur) interacts with many medications, so those drinks carry a note.
+  const hasGrapefruit = (d) => ingsOf(d).some((x) => /grapefruit|pamplemousse/i.test([x.type, x.item, x.bottle, x.pour].join(" ")));
+  const GRAPEFRUIT = "Contains grapefruit, which can interfere with a wide range of medications.";
   const ingsOf = (d) => REC[d.name] || ingredients(d.ingredients);
   // What the sheet's Status column says we'd have to buy for a drink.
   const missingOf = (d) => [...new Set((REC[d.name] || []).filter((x) => x.status === "Buy").map((x) => x.pour || x.bottle || x.type))];
@@ -111,6 +106,7 @@
       ${d.description ? `<p class="dd">${esc(d.description)}</p>` : ""}
       <p class="di">${ings.map(ingHTML).join('<span class="sep">·</span>')}</p>
       ${miss.length ? giftLine(miss) : ""}
+      ${hasGrapefruit(d) ? `<p class="advisory">${GRAPEFRUIT}</p>` : ""}
       <p class="dm">${meta.map(esc).join(" · ")}${src && !house ? " · via " + esc(src) : ""}${photoUrl(d.photo_url) ? ' <span class="cam">◉ photo</span>' : ""}</p>
     </li>`;
   }
@@ -191,7 +187,7 @@
       <p class="choose">Show</p>
       <div class="choice"><button data-full="0" aria-pressed="${!full}">Tonight's menu</button><button data-full="1" aria-pressed="${full}">Full menu</button></div>
       ${full ? `<p class="full-note">${tight(S["full menu note"] || "The full menu includes drinks we can't make tonight. If one's missing something, bring it as a gift for the bar and the first one's yours.")}</p>` : ""}
-      <div class="contents"><div><h3>Cocktails</h3><ul>${contents("cocktails")}</ul></div><div><h3>The Shelf</h3><ul>${contents("shelf")}</ul></div></div>
+      <div class="contents"><div><h3>Cocktails</h3><ul>${contents("cocktails")}</ul></div><div><h3>On the Shelf</h3><ul>${contents("shelf")}</ul></div></div>
       <p class="swipe">Swipe sideways or use the tabs up top →</p>
       ${orn}
       <div class="status">${source === "live" ? '<span class="live">Poured live from the shelf</span>' : '<span class="stale">Showing a saved copy' + (at ? " from " + new Date(at).toLocaleDateString() : "") + "</span>"}</div>
@@ -211,7 +207,7 @@
     let lastKind = "";
     tabsEl.innerHTML = pages.map((p, i) => {
       let pre = "";
-      if (p.kind !== lastKind && p.kind !== "cover") pre = `<span class="tgroup">${p.kind === "shelf" ? "The Shelf" : "Cocktails"}</span>`;
+      if (p.kind !== lastKind && p.kind !== "cover") pre = `<span class="tgroup">${p.kind === "shelf" ? "On the Shelf" : "Cocktails"}</span>`;
       lastKind = p.kind;
       return pre + `<button class="tab${p.kind === "cover" ? " home" : ""}" role="tab" data-i="${i}" aria-label="${esc(p.tab === "home" ? "Welcome" : p.tab)}">${p.kind === "cover" ? HOME_ICON : esc(p.tab)}</button>`;
     }).join("");
@@ -298,6 +294,7 @@
       ${d.description ? `<p class="dd">${esc(d.description)}</p>` : ""}
       <table class="spec">${ingsOf(d).map((x) => `<tr><td class="amt">${esc(x.amt)}</td><td>${esc(ingName(x))}${guestNote(x.note) ? `<span class="inote">, ${esc(guestNote(x.note))}</span>` : ""}${x.status === "Sub" && x.pour ? ` <span class="tag sub">subbed with ${esc(fullName(x.pour))}</span>` : ""}${x.status === "Buy" ? ' <span class="tag miss">missing</span>' : ""}</td></tr>`).join("")}</table>
       ${missingOf(d).length ? giftLine(missingOf(d)) : ""}
+      ${hasGrapefruit(d) ? `<p class="advisory">${GRAPEFRUIT}</p>` : ""}
       ${d.instructions ? `<p class="instr">${esc(d.instructions)}</p>` : ""}
       ${facts.length ? `<dl class="facts">${facts.map((f) => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join("")}</dl>` : ""}
       ${src ? `<p class="src">Recipe: ${d.source_url ? `<a href="${esc(d.source_url)}" target="_blank" rel="noopener">${esc(src)}</a>` : esc(src)}</p>` : ""}</div>`;

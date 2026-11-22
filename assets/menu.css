@@ -199,6 +199,8 @@ dialog.detail::backdrop { background: rgba(27, 24, 21, .45); }
 .tag.miss { color: #a33a2a; }
 .tag.sub { color: var(--gold); }
 .gift { margin: 6px 0 0; font-size: 13.5px; font-style: italic; color: #8a3a2a; }
+.advisory { margin: 6px 0 0; font-size: 12.5px; font-style: italic; color: var(--ink-2); }
+.advisory::before { content: "\26A0\FE0E  "; font-style: normal; }
 .full-note { max-width: 40ch; margin: 4px auto 0; font: italic 14px/1.45 var(--serif); color: var(--ink-2); }
 
 /* ---------- Shelf pages: one heading per type ---------- */

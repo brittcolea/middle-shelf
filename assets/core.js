@@ -150,7 +150,7 @@
       if (!bottle && pantryTypes.has(type) && !/^(Luxardo|Tabasco)/.test(type)) label = type.charAt(0).toLowerCase() + type.slice(1);
       const n = parseFloat(r.amount) || 0, unit = (r.unit || "").toLowerCase();
       const unitWord = unit === "dash" ? (n > 1 || /-/.test(r.amount) ? "dashes" : "dash")
-        : unit === "cup" ? (n > 1 ? "cups" : "cup") : unit === "whole" ? "" : unit === "leaves" ? "" : unit;
+        : /^(cup|slice|wedge)$/.test(unit) ? (n > 1 ? unit + "s" : unit) : unit === "whole" ? "" : unit === "leaves" ? "" : unit;
       if (unit === "leaves") label += " leaves";
       let amt = [PRETTY(r.amount), unitWord].filter(Boolean).join(" ");
       if (unit === "top" && !r.amount) amt = "top";

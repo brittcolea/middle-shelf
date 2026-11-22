@@ -210,19 +210,18 @@
     const id = "a" + ++uid;
     const SHELF = 178;
     const plank = `<rect x="6" y="${SHELF}" width="368" height="11" rx="1.5" fill="#d8c29a" ${S(2.6)}/>` + shade(id, `M6 ${SHELF} h368 v11 h-368 Z`, true, true);
-    const bracket = (x) => `<path d="M${x} ${SHELF + 11} l0 22 l16 0 Z" fill="${PAPER}" ${S(2.2)}/><circle cx="${x + 4.5}" cy="${SHELF + 19}" r="2" fill="${INK}"/>`;
     const row = [["wine", "#9e2235", .68], ["whiskey", "#c47a2c", .64], ["gin", "#dfe8e2", .7], ["rum", "#c9772e", .62],
       ["vodka", "#e6ecef", .74], ["tequila", "#e6d79a", .64], ["cognac", "#b3622a", .62], ["whiskey", "#7a3b1e", .68]];
     const step = 352 / row.length;
     const bottlesRow = row.map(([k, c, sc], i) => place(bottle(id, k, c), 6 + i * step + step / 2 - 60 * sc, SHELF - 250 * sc, sc)).join("");
-    return `<svg class="logo" viewBox="0 0 380 216" role="img" aria-label="The Middle Shelf">${defs(id)}
+    return `<svg class="logo" viewBox="0 0 380 194" role="img" aria-label="The Middle Shelf">${defs(id)}
       ${bottlesRow}
       <rect x="22" y="${SHELF - 52}" width="336" height="52" fill="${INK}" opacity=".18" transform="translate(3 3)"/>
       <rect x="22" y="${SHELF - 52}" width="336" height="52" fill="${PAPER}" ${S(2.4)}/>
       <rect x="27" y="${SHELF - 47}" width="326" height="42" fill="none" ${S(1)}/>
       <text x="190" y="${SHELF - 14}" text-anchor="middle" class="logo-word" font-size="36" letter-spacing="2"
         fill="${INK}">THE MIDDLE SHELF</text>
-      ${plank}${bracket(30)}${bracket(334)}
+      ${plank}
     </svg>`;
   }
 
