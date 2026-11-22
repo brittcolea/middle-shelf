@@ -4,7 +4,7 @@
   const $ = (s, el = document) => el.querySelector(s);
   const track = $(".track"), tabsEl = $(".tabs");
 
-  const FAMILIES = ["Old-Fashioned", "Martini", "Daiquiri", "Sidecar", "Highball", "Flip"];
+  const CODEX = ["Old-Fashioned", "Martini", "Daiquiri", "Sidecar", "Highball", "Flip"];
   const SPIRITS = [
     ["Whiskey", /whisk|bourbon|rye|scotch|irish/i], ["Gin", /\bgin\b/i], ["Rum", /rum|cacha/i],
     ["Agave", /tequila|mezcal|agave/i], ["Brandy", /brandy|cognac|calvados|pisco|armagnac/i], ["Vodka", /vodka/i],
@@ -18,6 +18,20 @@
   const intros = {};
   data["Shelf Intros"].forEach((r) => { if (r.family) intros[r.family.toLowerCase()] = r.intro; });
   if (S["bar name"]) document.title = S["bar name"];
+
+  // Family names, order and blurbs come from the "Family: <name>" rows in Settings.
+  // They line up, in order, with Cocktail Codex's six families, which pick the drawing
+  // for each page and let older sheet values (e.g. "Daiquiri") still find their family.
+  const settingFams = data.Settings.map((r) => /^family:\s*(.+)$/i.exec(r.setting || "")).filter(Boolean).map((m) => m[1].trim());
+  const FAM_NAMES = settingFams.length ? settingFams : CODEX;
+  const famOf = (d) => {
+    const v = String(d.codex_family || d.family || "").trim();
+    const i = FAM_NAMES.findIndex((f) => f.toLowerCase() === v.toLowerCase());
+    if (i >= 0) return FAM_NAMES[i];
+    const j = CODEX.findIndex((f) => f.toLowerCase() === v.toLowerCase());
+    return j >= 0 && FAM_NAMES[j] ? FAM_NAMES[j] : "More";
+  };
+  const sceneFor = (f) => { const i = FAM_NAMES.indexOf(f); return i >= 0 && CODEX[i] ? CODEX[i] : f; };
 
   const drinks = data.Cocktails.filter((d) => d.name && yes(d.on_menu));
   const REC = MS.recipes(data["Recipe Ingredients"], data.Lists);
@@ -70,10 +84,10 @@
     if (house.length) pages.push(cocktailPage("house", "House Originals", "house", S["house originals note"], house));
 
     if (grouping === "family") {
-      const fams = [...FAMILIES, "More"];
-      fams.forEach((f) => {
-        const list = drinks.filter((d) => (FAMILIES.includes(d.codex_family) ? d.codex_family : "More") === f);
-        if (list.length) pages.push(cocktailPage(f.toLowerCase(), f === "More" ? "More Drinks" : f, f, S["family: " + f.toLowerCase()], list));
+      [...FAM_NAMES, "More"].forEach((f) => {
+        const list = drinks.filter((d) => famOf(d) === f);
+        if (list.length) pages.push(cocktailPage("fam-" + f.toLowerCase().replace(/\W+/g, "-"), f === "More" ? "More Drinks" : f,
+          sceneFor(f), S["family: " + f.toLowerCase()], list));
       });
     } else {
       [...SPIRITS.map((s) => s[0]), "Liqueurs & More"].forEach((sp) => {
@@ -192,7 +206,7 @@
   function openDrink(d) {
     const img = photoUrl(d.photo_url);
     const src = d.source || hostOf(d.source_url);
-    const facts = [["Glass", d.glass], ["Method", d.method], ["Garnish", d.garnish], ["Family", d.codex_family]].filter((f) => f[1]);
+    const facts = [["Glass", d.glass], ["Method", d.method], ["Garnish", d.garnish], ["Family", famOf(d) === "More" ? "" : famOf(d)]].filter((f) => f[1]);
     $(".d-content", dlg).innerHTML =
       `<div class="d-art">${img ? `<img alt="${esc(d.name)}" src="${esc(img)}">` : drinkArt(d, drinkColor(d))}</div>
       <div class="d-body"><div class="dn">${esc(d.name)}${yes(d.house_original) ? '<span class="house-mark">House</span>' : ""}</div>
