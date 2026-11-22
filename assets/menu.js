@@ -12,7 +12,14 @@
   const SHELF_ORDER = ["Whiskey", "Gin", "Rum", "Agave", "Brandy", "Vodka", "Liqueur", "Amaro & Aperitivo", "Vermouth & Fortified", "Bitters", "Other"];
   const spiritOf = (d) => (SPIRITS.find(([, re]) => re.test(d.base_spirit || "")) || ["Liqueurs & More"])[0];
 
-  const { data, source, at } = await MS.load(["Cocktails", "Recipe Ingredients", "Bottles", "Shelf Intros", "Settings", "Lists"]);
+  const { data, source, at } = await MS.load(["Cocktails", "Recipe Ingredients", "Bottles", "Shelf Intros", "Settings", "Lists", "Styles"]);
+  // Styles tab: row order sets the order of types on the Shelf pages; Shelf note is the line under each type.
+  const STYLES = (data.Styles || []).filter((s) => s.style);
+  const styleIdx = (name) => { const i = STYLES.findIndex((s) => s.style === name); return i < 0 ? 999 : i; };
+  const styleNote = (name) => { const s = STYLES.find((x) => x.style === name); return s ? (s.shelf_note || "") : ""; };
+  const styleTitle = (name) => String(name || "").replace(/\s*\(.*?\)\s*/g, "").trim();
+  // Keep the last two words together so a line never ends on a lone word.
+  const tight = (s) => esc(s).replace(/ (\S+)$/, "&nbsp;$1");
   const S = {};
   data.Settings.forEach((r) => { if (r.setting) S[r.setting.toLowerCase()] = r.value; });
   const intros = {};
@@ -95,7 +102,7 @@
     return {
       id, tab: title, kind: "cocktails",
       html: `<div class="inner">${frame(
-        arch(title) + scene(sceneKey, title) + (blurb ? `<p class="blurb">${esc(blurb)}</p>` : "") +
+        arch(title) + scene(sceneKey, title) + (blurb ? `<p class="blurb">${tight(blurb)}</p>` : "") +
         `<ol class="drinks">${list.map(drinkHTML).join("")}</ol>`)}</div>`,
     };
   }
@@ -124,14 +131,26 @@
 
     const fams = [...new Set([...SHELF_ORDER, ...bottles.map((b) => b.family || "Other")])];
     fams.forEach((fam) => {
-      const list = bottles.filter((b) => (b.family || "Other") === fam);
+      const list = bottles.filter((b) => (b.family || "Other") === fam)
+        .sort((a, b) => styleIdx(a.style) - styleIdx(b.style) || a.bottle.localeCompare(b.bottle));
       if (!list.length) return;
+      // Group by style, in Styles-tab order, each with its heading and shelf note.
+      const groups = [];
+      list.forEach((b) => {
+        const st = b.style || fam;
+        if (!groups.length || groups[groups.length - 1].style !== st) groups.push({ style: st, items: [] });
+        groups[groups.length - 1].items.push(b);
+      });
+      const bottleLi = (b) => `<li><span class="bn">${esc(b.bottle)}</span>${statusOf(b.status) === "low" ? '<span class="last">Last pours</span>' : ""}
+        ${b.guest_note ? `<span class="bnote">${esc(b.guest_note)}</span>` : ""}</li>`;
       pages.push({
         id: "shelf-" + fam.toLowerCase().replace(/\W+/g, "-"), tab: fam.replace(" & ", " & "), kind: "shelf",
         html: `<div class="inner">${orn}${arch(fam)}${scene(fam, fam)}
-          ${intros[fam.toLowerCase()] ? `<p class="intro">${esc(intros[fam.toLowerCase()])}</p>` : ""}
-          <ul class="bottles">${list.map((b) => `<li><span class="bn">${esc(b.bottle)}</span>${statusOf(b.status) === "low" ? '<span class="last">Last pours</span>' : ""}
-            ${b.style ? `<span class="bs">${esc(b.style)}</span>` : ""}${b.guest_note ? `<span class="bnote">${esc(b.guest_note)}</span>` : ""}</li>`).join("")}</ul>
+          ${intros[fam.toLowerCase()] ? `<p class="intro">${tight(intros[fam.toLowerCase()])}</p>` : ""}
+          ${groups.map((g) => `<section class="stype">
+            <h3 class="st-name">${esc(styleTitle(g.style))}</h3>
+            ${styleNote(g.style) ? `<p class="st-note">${tight(styleNote(g.style))}</p>` : ""}
+            <ul class="bottles">${g.items.map(bottleLi).join("")}</ul></section>`).join("")}
           ${orn}</div>`,
       });
     });
@@ -139,12 +158,12 @@
     const contents = (kind) => pages.filter((p) => p.kind === kind)
       .map((p) => `<li><button data-go="${p.id}">${esc(p.tab)}<span>${p.kind === "cocktails" ? (p.html.match(/class="drink"/g) || []).length : ""}</span></button></li>`).join("");
     pages[0].html = `<div class="inner cover">${orn}${logo()}
-      ${S["tagline"] ? `<p class="tagline">${esc(S["tagline"])}</p>` : ""}
+      ${S["tagline"] ? `<p class="tagline">${tight(S["tagline"])}</p>` : ""}
       <p class="choose">Browse the cocktails by</p>
       <div class="choice"><button data-g="family" aria-pressed="${grouping === "family"}">Family</button><button data-g="spirit" aria-pressed="${grouping === "spirit"}">Spirit</button></div>
       <p class="choose">Show</p>
       <div class="choice"><button data-full="0" aria-pressed="${!full}">Tonight's menu</button><button data-full="1" aria-pressed="${full}">Full menu</button></div>
-      ${full ? `<p class="full-note">${esc(S["full menu note"] || "The full menu includes drinks we can't make tonight. If one's missing something, bring it as a gift for the bar and the first one's yours.")}</p>` : ""}
+      ${full ? `<p class="full-note">${tight(S["full menu note"] || "The full menu includes drinks we can't make tonight. If one's missing something, bring it as a gift for the bar and the first one's yours.")}</p>` : ""}
       <div class="contents"><div><h3>Cocktails</h3><ul>${contents("cocktails")}</ul></div><div><h3>The Shelf</h3><ul>${contents("shelf")}</ul></div></div>
       <p class="swipe">Swipe sideways or use the tabs up top →</p>
       ${orn}

@@ -200,3 +200,16 @@ dialog.detail::backdrop { background: rgba(27, 24, 21, .45); }
 .tag.sub { color: var(--gold); }
 .gift { margin: 6px 0 0; font-size: 13.5px; font-style: italic; color: #8a3a2a; }
 .full-note { max-width: 40ch; margin: 4px auto 0; font: italic 14px/1.45 var(--serif); color: var(--ink-2); }
+
+/* ---------- Shelf pages: one heading per type ---------- */
+.stype { max-width: 620px; margin: 22px auto 0; }
+.st-name {
+  margin: 0; text-align: center; font: 400 21px/1.15 var(--display);
+  padding-bottom: 6px; border-bottom: 1px solid var(--ink); box-shadow: 0 3px 0 -2px var(--ink);
+}
+.st-note { margin: 10px auto 4px; max-width: 46ch; text-align: center; font-style: italic; color: var(--ink-2); font-size: 14.5px; }
+.stype .bottles li:first-child { border-top: 0; }
+
+/* No lone last words: balance centered text, tidy body copy. */
+.blurb, .intro, .tagline, .full-note, .st-note { text-wrap: balance; }
+.dd, .di, .bnote, .gift, .instr { text-wrap: pretty; }
