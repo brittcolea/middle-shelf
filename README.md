@@ -14,7 +14,9 @@ If the sheet can't be reached (or you open `index.html` straight from your compu
 
 ## Rebuilding the sheet
 
-`tools/rebuild_sheet.py` rebuilds the whole workbook from CSV exports of the live sheet (so edits are kept), adds the dropdowns, and writes `data/snapshot.js`. It's only for structural changes; day-to-day edits happen in Google Sheets.
+`tools/rebuild_sheet.py` was a one-time conversion from the original sheet layout (ingredients as text) to the current one (Recipe Ingredients tab with dropdowns). It refuses to run against the current layout. All changes now happen directly in Google Sheets.
+
+`tools/refresh_snapshot.mjs` updates `data/snapshot.js` (the saved copy shown when the sheet can't be reached) from the live sheet: `node tools/refresh_snapshot.mjs`.
 
 ## Files
 

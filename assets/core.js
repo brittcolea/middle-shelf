@@ -139,7 +139,7 @@
     String(text || "").split(/\n|;(?![^()]*\))/).map(parseIngredient).filter(Boolean);
 
   // ---------- Recipe Ingredients (one row per ingredient) ----------
-  // Returns { drinkName: [{ amt, item, note, type, bottle }] }
+  // Returns { drinkName: [{ amt, item, note, type, bottle, status, pour }] }
   function recipes(rows, lists) {
     const pantryTypes = new Set((lists || []).filter((l) => /pantry/i.test(l.kind || "")).map((l) => l.ingredient));
     const map = {};
@@ -155,7 +155,10 @@
       let amt = [PRETTY(r.amount), unitWord].filter(Boolean).join(" ");
       if (unit === "top" && !r.amount) amt = "top";
       if (unit === "splash" && !r.amount) amt = "splash";
-      (map[r.drink] = map[r.drink] || []).push({ amt, item: label, note: r.note || "", type, bottle });
+      // The sheet's Status column: "Have it", "Sub" (pour a same-style bottle instead) or "Buy".
+      const status = r.status || "", pour = r.pour || "";
+      if (status === "Sub" && pour) label += " (subbed with " + pour + ")";
+      (map[r.drink] = map[r.drink] || []).push({ amt, item: label, note: r.note || "", type, bottle, status, pour });
     });
     return map;
   }

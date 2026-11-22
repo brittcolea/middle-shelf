@@ -18,6 +18,9 @@ def read(tab):
     return head, [dict(zip(head, r)) for r in rows[1:] if any(c.strip() for c in r)]
 
 c_head, cocktails = read("Cocktails")
+if "Ingredients" not in c_head or os.path.exists(os.path.join(LIVE, "Recipe Ingredients.csv")):
+    sys.exit("This was a one-time conversion from the old sheet layout (ingredients as text in the Cocktails tab).\n"
+             "The live sheet already uses the Recipe Ingredients tab; edit it in Google Sheets instead.")
 b_head, bottles = read("Bottles")
 p_head, pantry = read("Pantry")
 _, settings = read("Settings")

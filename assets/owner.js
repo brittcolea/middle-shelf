@@ -25,6 +25,8 @@
   const pantryOk = (name) => pantry.some((p) => norm(p.item) === norm(name) && (onShelf(p.status) || !p.status));
   function missing(d) {
     const rows = REC[d.name] || [];
+    // Prefer the sheet's own Status column so the dashboard and the sheet always agree.
+    if (rows.some((r) => r.status)) return rows.filter((r) => r.status === "Buy").map((r) => r.pour || r.bottle || r.type);
     return rows.filter((r) => {
       if (r.bottle) return !onShelfBottles.some((b) => b.bottle === r.bottle);
       if (kindOf[r.type] === "pantry") return !pantryOk(stockedAs[r.type]);
