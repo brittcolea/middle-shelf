@@ -175,7 +175,7 @@
     });
 
     const contents = (kind) => pages.filter((p) => p.kind === kind)
-      .map((p) => `<li><button data-go="${p.id}">${esc(p.tab)}<span>${p.kind === "cocktails" ? (p.html.match(/class="drink"/g) || []).length : ""}</span></button></li>`).join("");
+      .map((p) => `<li><button data-go="${p.id}">${esc(p.tab)}<span>${p.kind === "cocktails" ? (p.html.match(/class="drink[ "]/g) || []).length : ""}</span></button></li>`).join("");
     pages[0].html = `<div class="inner cover">${orn}${logo()}
       ${S["tagline"] ? `<p class="tagline">${tight(S["tagline"])}</p>` : ""}
       <p class="choose">Browse the cocktails by</p>

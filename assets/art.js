@@ -217,8 +217,11 @@
     const bottlesRow = row.map(([k, c, sc], i) => place(bottle(id, k, c), 6 + i * step + step / 2 - 60 * sc, SHELF - 250 * sc, sc)).join("");
     return `<svg class="logo" viewBox="0 0 380 216" role="img" aria-label="The Middle Shelf">${defs(id)}
       ${bottlesRow}
-      <text x="190" y="${SHELF - 6}" text-anchor="middle" class="logo-word" font-size="42" textLength="358" lengthAdjust="spacingAndGlyphs"
-        fill="${INK}" stroke="${PAPER}" stroke-width="7" stroke-linejoin="round" paint-order="stroke">THE MIDDLE SHELF</text>
+      <rect x="22" y="${SHELF - 52}" width="336" height="52" fill="${INK}" opacity=".18" transform="translate(3 3)"/>
+      <rect x="22" y="${SHELF - 52}" width="336" height="52" fill="${PAPER}" ${S(2.4)}/>
+      <rect x="27" y="${SHELF - 47}" width="326" height="42" fill="none" ${S(1)}/>
+      <text x="190" y="${SHELF - 14}" text-anchor="middle" class="logo-word" font-size="36" letter-spacing="2"
+        fill="${INK}">THE MIDDLE SHELF</text>
       ${plank}${bracket(30)}${bracket(334)}
     </svg>`;
   }
