@@ -27,4 +27,4 @@ If the sheet can't be reached (or you open `index.html` straight from your compu
 
 After changing a file in `assets/`, bump the `?v=` number on its `<script>` or `<link>` tag so phones pick up the new version.
 
-Style notes on the shelf pages are paraphrased from *Cocktail Codex* by Alex Day, Nick Fauchald and David Kaplan.
+Style notes on the shelf pages are paraphrased from *Cocktail Codex* by Alex Day, Nick Fauchald, and David Kaplan.

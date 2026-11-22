@@ -19,7 +19,7 @@
   data["Shelf Intros"].forEach((r) => { if (r.family) intros[r.family.toLowerCase()] = r.intro; });
   if (S["bar name"]) document.title = S["bar name"];
 
-  // Family names, order and blurbs come from the "Family: <name>" rows in Settings.
+  // Family names, order, and blurbs come from the "Family: <name>" rows in Settings.
   // They line up, in order, with Cocktail Codex's six families, which pick the drawing
   // for each page and let older sheet values (e.g. "Daiquiri") still find their family.
   const settingFams = data.Settings.map((r) => /^family:\s*(.+)$/i.exec(r.setting || "")).filter(Boolean).map((m) => m[1].trim());
@@ -47,7 +47,9 @@
     drinks = full ? ALL.filter((d) => (REC[d.name] || []).length || d.ingredients)
       : ALL.filter((d) => yes(d.on_menu) && !missingOf(d).length);
   };
-  const listText = (a) => a.length < 2 ? (a[0] || "") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+  // "a", "a and b", "a, b, and c" (always the serial comma)
+  const listText = (a) => a.length < 2 ? (a[0] || "") : a.length === 2 ? a[0] + " and " + a[1]
+    : a.slice(0, -1).join(", ") + ", and " + a[a.length - 1];
   // Pantry things (grenadine, cola, honey syrup) read lowercase; bottles and brands keep their capitals.
   const pantryNames = new Set((data.Lists || []).filter((l) => /pantry/i.test(l.kind || ""))
     .flatMap((l) => [l.ingredient, l.stocked_as]).filter(Boolean).map((s) => s.toLowerCase()));
@@ -147,7 +149,7 @@
       <p class="swipe">Swipe sideways or use the tabs up top →</p>
       ${orn}
       <div class="status">${source === "live" ? '<span class="live">Poured live from the shelf</span>' : '<span class="stale">Showing a saved copy' + (at ? " from " + new Date(at).toLocaleDateString() : "") + "</span>"}</div>
-      <div class="credit">${esc(S["footer note"] || "Style notes adapted from Cocktail Codex by Alex Day, Nick Fauchald & David Kaplan.")}</div>
+      <div class="credit">${esc(S["footer note"] || "Style notes adapted from Cocktail Codex by Alex Day, Nick Fauchald, and David Kaplan.")}</div>
     </div>`;
     return pages;
   }
