@@ -85,7 +85,7 @@
     const src = d.source || hostOf(d.source_url);
     const miss = missingOf(d);
     return `<li class="drink${miss.length ? " is-missing" : ""}" tabindex="0" data-i="${ALL.indexOf(d)}">
-      <div class="dn">${esc(d.name)}${house ? '<span class="house-mark">House</span>' : ""}</div>
+      <div class="dn">${esc(d.name)}${house ? '<span class="house-mark">House</span>' : ""}${yes(d.favorite) ? '<span class="fav-mark">★ Favorite</span>' : ""}</div>
       ${d.description ? `<p class="dd">${esc(d.description)}</p>` : ""}
       <p class="di">${ings.map(ingHTML).join('<span class="sep">·</span>')}</p>
       ${miss.length ? giftLine(miss) : ""}
@@ -99,12 +99,16 @@
       <button data-g="spirit" aria-pressed="${grouping === "spirit"}">Spirit</button></div>`;
   }
 
+  // House originals first, then favorites, then everything else (sheet order otherwise).
+  const rank = (d) => (yes(d.house_original) ? 0 : yes(d.favorite) ? 1 : 2);
+  const rankFirst = (list) => list.map((d, i) => [d, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map((x) => x[0]);
+
   function cocktailPage(id, title, sceneKey, blurb, list) {
     return {
       id, tab: title, kind: "cocktails",
       html: `<div class="inner">${frame(
         arch(title) + scene(sceneKey, title) + (blurb ? `<p class="blurb">${tight(blurb)}</p>` : "") +
-        `<ol class="drinks">${list.map(drinkHTML).join("")}</ol>`)}</div>`,
+        `<ol class="drinks">${rankFirst(list).map(drinkHTML).join("")}</ol>`)}</div>`,
     };
   }
 
@@ -265,7 +269,7 @@
     const facts = [["Glass", d.glass], ["Method", d.method], ["Garnish", d.garnish], ["Family", famOf(d) === "More" ? "" : famOf(d)]].filter((f) => f[1]);
     $(".d-content", dlg).innerHTML =
       `<div class="d-art">${img ? `<img alt="${esc(d.name)}" src="${esc(img)}">` : drinkArt(d, drinkColor(d))}</div>
-      <div class="d-body"><div class="dn">${esc(d.name)}${yes(d.house_original) ? '<span class="house-mark">House</span>' : ""}</div>
+      <div class="d-body"><div class="dn">${esc(d.name)}${yes(d.house_original) ? '<span class="house-mark">House</span>' : ""}${yes(d.favorite) ? '<span class="fav-mark">★ Favorite</span>' : ""}</div>
       ${d.description ? `<p class="dd">${esc(d.description)}</p>` : ""}
       <table class="spec">${ingsOf(d).map((x) => `<tr><td class="amt">${esc(x.amt)}</td><td>${esc(x.base || x.item)}${x.note ? `<span class="inote">, ${esc(x.note)}</span>` : ""}${x.status === "Sub" && x.pour ? ` <span class="tag sub">subbed with ${esc(x.pour)}</span>` : ""}${x.status === "Buy" ? ' <span class="tag miss">missing</span>' : ""}</td></tr>`).join("")}</table>
       ${missingOf(d).length ? giftLine(missingOf(d)) : ""}

@@ -213,3 +213,9 @@ dialog.detail::backdrop { background: rgba(27, 24, 21, .45); }
 /* No lone last words: balance centered text, tidy body copy. */
 .blurb, .intro, .tagline, .full-note, .st-note { text-wrap: balance; }
 .dd, .di, .bnote, .gift, .instr { text-wrap: pretty; }
+
+/* Favorite mark, next to the House mark */
+.fav-mark {
+  display: inline-block; vertical-align: 4px; margin-left: 6px; padding: 3px 7px 2px; border: 1px solid var(--gold); border-radius: 999px;
+  font: 600 9.5px/1 var(--serif); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); white-space: nowrap;
+}
