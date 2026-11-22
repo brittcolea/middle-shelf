@@ -36,7 +36,7 @@ const snap = {
     .map((b) => pick(b, ["bottle", "family", "style", "status", "guest_note", "show_on_menu"])),
   "Shelf Intros": await tab("Shelf Intros"),
   Settings: await tab("Settings"),
-  Styles: (await tab("Styles")).map((r) => pick(r, ["style", "family", "shelf_note"])).filter((r) => r.style),
+  Styles: (await tab("Styles")).map((r) => pick(r, ["style", "family", "shelf_note", "menu_label"])).filter((r) => r.style),
   Lists: (await tab("Lists")).map((l) => pick(l, ["ingredient", "kind", "stocked_as"])).filter((l) => l.ingredient),
 };
 writeFileSync(new URL("../data/snapshot.js", import.meta.url),

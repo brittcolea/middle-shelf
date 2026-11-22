@@ -17,6 +17,19 @@
   const STYLES = (data.Styles || []).filter((s) => s.style);
   const styleIdx = (name) => { const i = STYLES.findIndex((s) => s.style === name); return i < 0 ? 999 : i; };
   const styleNote = (name) => { const s = STYLES.find((x) => x.style === name); return s ? (s.shelf_note || "") : ""; };
+  // "Hendrick's" -> "Hendrick's Modern Gin": add the bottle's type (Styles tab Menu label) unless the
+  // name already says it. Words already in the name aren't repeated ("Rittenhouse Rye" -> "Rittenhouse Rye Whiskey").
+  const BOTTLE_STYLE = {}; (data.Bottles || []).forEach((b) => { if (b.bottle) BOTTLE_STYLE[b.bottle] = b.style; });
+  const menuLabel = (style) => { const s = STYLES.find((x) => x.style === style); return s ? (s.menu_label || s.style) : ""; };
+  const wordsOf = (t) => String(t).toLowerCase().split(/[\s/]+/).map((w) => w.replace(/[^a-z0-9À-ɏ-]/g, "")).filter(Boolean);
+  const fullName = (name) => {
+    const label = menuLabel(BOTTLE_STYLE[name]);
+    if (!name || !label) return name;
+    const have = new Set(wordsOf(name)), lw = wordsOf(label);
+    if (have.has(lw[lw.length - 1])) return name;
+    const add = label.split(/\s+/).filter((w) => !have.has(wordsOf(w)[0]));
+    return add.length ? name + " " + add.join(" ") : name;
+  };
   const styleTitle = (name) => String(name || "").replace(/\s*\(.*?\)\s*/g, "").trim();
   // Keep the last two words together so a line never ends on a lone word.
   const tight = (s) => esc(s).replace(/ (\S+)$/, "&nbsp;$1");
@@ -63,9 +76,10 @@
     .flatMap((l) => [l.ingredient, l.stocked_as]).filter(Boolean).map((s) => s.toLowerCase()));
   const nice = (s) => pantryNames.has(String(s).toLowerCase()) ? s.charAt(0).toLowerCase() + s.slice(1) : s;
   const giftLine = (miss) =>
-    `<p class="gift">We're out of ${esc(listText(miss.map(nice)))}. Bring some as a gift for the bar and the first one's yours.</p>`;
-  const ingHTML = (x) => esc((x.amt ? x.amt + " " : "") + (x.base || x.item)) +
-    (x.status === "Sub" && x.pour ? ` <span class="tag sub">subbed with ${esc(x.pour)}</span>` : "") +
+    `<p class="gift">We're out of ${esc(listText(miss.map((m) => nice(fullName(m)))))}. Bring some as a gift for the bar and the first one's yours.</p>`;
+  const ingName = (x) => (x.bottle && (x.base || x.item) === x.bottle ? fullName(x.bottle) : (x.base || x.item));
+  const ingHTML = (x) => esc((x.amt ? x.amt + " " : "") + ingName(x)) +
+    (x.status === "Sub" && x.pour ? ` <span class="tag sub">subbed with ${esc(fullName(x.pour))}</span>` : "") +
     (x.status === "Buy" ? ' <span class="tag miss">missing</span>' : "");
   const bottles = data.Bottles.filter((b) => b.bottle && onShelf(b.status) && !no(b.show_on_menu));
   let grouping = (() => { try { return localStorage.getItem("ms-group"); } catch (e) { return null; } })() ||
@@ -271,7 +285,7 @@
       `<div class="d-art">${img ? `<img alt="${esc(d.name)}" src="${esc(img)}">` : drinkArt(d, drinkColor(d))}</div>
       <div class="d-body"><div class="dn">${esc(d.name)}${yes(d.house_original) ? '<span class="house-mark">House</span>' : ""}${yes(d.favorite) ? '<span class="fav-mark">★ Favorite</span>' : ""}</div>
       ${d.description ? `<p class="dd">${esc(d.description)}</p>` : ""}
-      <table class="spec">${ingsOf(d).map((x) => `<tr><td class="amt">${esc(x.amt)}</td><td>${esc(x.base || x.item)}${x.note ? `<span class="inote">, ${esc(x.note)}</span>` : ""}${x.status === "Sub" && x.pour ? ` <span class="tag sub">subbed with ${esc(x.pour)}</span>` : ""}${x.status === "Buy" ? ' <span class="tag miss">missing</span>' : ""}</td></tr>`).join("")}</table>
+      <table class="spec">${ingsOf(d).map((x) => `<tr><td class="amt">${esc(x.amt)}</td><td>${esc(ingName(x))}${x.note ? `<span class="inote">, ${esc(x.note)}</span>` : ""}${x.status === "Sub" && x.pour ? ` <span class="tag sub">subbed with ${esc(fullName(x.pour))}</span>` : ""}${x.status === "Buy" ? ' <span class="tag miss">missing</span>' : ""}</td></tr>`).join("")}</table>
       ${missingOf(d).length ? giftLine(missingOf(d)) : ""}
       ${d.instructions ? `<p class="instr">${esc(d.instructions)}</p>` : ""}
       ${facts.length ? `<dl class="facts">${facts.map((f) => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join("")}</dl>` : ""}

@@ -27,9 +27,9 @@
 
   // ---------- Glasses (local frame 200 x 240, base near y=215) ----------
   const GLASS = {
-    coupe: { rim: [100, 70, 60, 9], bowl: "M40 70 Q40 136 100 141 Q160 136 160 70", liq: "M47 84 Q49 130 100 134 Q151 130 153 84 Z", liqTop: [100, 84, 53, 7], stem: "M100 141 L100 204", base: [100, 210, 36, 7] },
+    coupe: { shine: "M53 81 q-1 14 4 25", rim: [100, 70, 60, 9], bowl: "M40 70 Q40 136 100 141 Q160 136 160 70", liq: "M47 84 Q49 130 100 134 Q151 130 153 84 Z", liqTop: [100, 84, 53, 7], stem: "M100 141 L100 204", base: [100, 210, 36, 7] },
     nick: { rim: [100, 52, 43, 7], bowl: "M57 52 Q54 136 100 143 Q146 136 143 52", liq: "M59 76 Q58 134 100 138 Q142 134 141 76 Z", liqTop: [100, 76, 41, 6], stem: "M100 143 L100 204", base: [100, 210, 32, 6] },
-    martini: { rim: [100, 56, 72, 9], bowl: "M28 56 L100 138 L172 56", liq: "M42 70 L100 132 L158 70 Z", liqTop: [100, 70, 58, 7], stem: "M100 138 L100 204", base: [100, 210, 36, 7] },
+    martini: { shine: "M46 68 L65 90", rim: [100, 56, 72, 9], bowl: "M28 56 L100 138 L172 56", liq: "M42 70 L100 132 L158 70 Z", liqTop: [100, 70, 58, 7], stem: "M100 138 L100 204", base: [100, 210, 36, 7] },
     rocks: { rim: [100, 108, 52, 8], bowl: "M48 108 L56 212 Q100 222 144 212 L152 108", liq: "M51 136 L55.6 200 Q100 209 144.4 200 L149 136 Z", liqTop: [100, 136, 49, 7], inner: "M56 200 Q100 209 144 200" },
     highball: { rim: [100, 36, 37, 6], bowl: "M63 36 L68 216 Q100 223 132 216 L137 36", liq: "M64.2 62 L68 206 Q100 213 132 206 L135.8 62 Z", liqTop: [100, 62, 36, 5], inner: "M68 206 Q100 213 132 206" },
     wine: { rim: [100, 40, 40, 7], bowl: "M60 40 Q50 122 100 130 Q150 122 140 40", liq: "M56 84 Q56 124 100 126 Q144 124 144 84 Z", liqTop: [100, 84, 44, 6], stem: "M100 130 L100 204", base: [100, 210, 34, 6] },
@@ -69,7 +69,7 @@
     o += ell(g.rim, `fill="none" ${S(2.6)}`);
     // highlight
     const [rx, ry, rw] = g.rim;
-    o += `<path d="M${rx - rw * .7} ${ry + 16} q-3 24 2 46" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".75"/>`;
+    o += `<path d="${g.shine || `M${rx - rw * .7} ${ry + 16} q-3 24 2 46`}" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".75"/>`;
     o += garnishFor(id, kind, garnish, g);
     return o;
   }
