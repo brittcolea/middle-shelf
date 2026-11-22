@@ -46,13 +46,14 @@
   // What the sheet's Status column says we'd have to buy for a drink.
   const missingOf = (d) => [...new Set((REC[d.name] || []).filter((x) => x.status === "Buy").map((x) => x.pour || x.bottle || x.type))];
 
-  // Tonight's menu: drinks marked On menu that can be made right now.
-  // Full menu: every drink in the sheet, missing ingredients flagged.
+  // Only drinks marked On menu = Yes ever show to guests.
+  // Tonight's menu: those you can make right now with what's in stock (subs included).
+  // Full menu: all of them, with missing ingredients flagged.
   let full = (() => { try { return localStorage.getItem("ms-full") === "1"; } catch (e) { return false; } })();
   let drinks = [];
   const pickDrinks = () => {
-    drinks = full ? ALL.filter((d) => (REC[d.name] || []).length || d.ingredients)
-      : ALL.filter((d) => yes(d.on_menu) && !missingOf(d).length);
+    const onMenu = ALL.filter((d) => yes(d.on_menu) && ((REC[d.name] || []).length || d.ingredients));
+    drinks = full ? onMenu : onMenu.filter((d) => !missingOf(d).length);
   };
   // "a", "a and b", "a, b, and c" (always the serial comma)
   const listText = (a) => a.length < 2 ? (a[0] || "") : a.length === 2 ? a[0] + " and " + a[1]
