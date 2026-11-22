@@ -201,6 +201,10 @@ dialog.detail::backdrop { background: rgba(27, 24, 21, .45); }
 .gift { margin: 6px 0 0; font-size: 13.5px; font-style: italic; color: #8a3a2a; }
 .advisory { margin: 6px 0 0; font-size: 12.5px; font-style: italic; color: var(--ink-2); }
 .advisory::before { content: "\26A0\FE0E  "; font-style: normal; }
+/* In the drink detail, notes under the recipe table keep the same gap the table leaves above the instructions. */
+.d-body .spec + .gift, .d-body .spec + .advisory { margin-top: -4px; }
+.d-body .gift, .d-body .advisory { margin-bottom: 14px; line-height: 1.45; }
+.d-body .gift + .advisory { margin-top: -8px; }
 .full-note { max-width: 40ch; margin: 4px auto 0; font: italic 14px/1.45 var(--serif); color: var(--ink-2); }
 
 /* ---------- Shelf pages: one heading per type ---------- */
