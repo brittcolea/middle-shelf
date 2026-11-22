@@ -56,8 +56,17 @@
   const ALL = data.Cocktails.filter((d) => d.name);
   const REC = MS.recipes(data["Recipe Ingredients"], data.Lists);
   // Grapefruit (juice, soda, liqueur) interacts with many medications, so those drinks carry a note.
-  const hasGrapefruit = (d) => ingsOf(d).some((x) => /grapefruit|pamplemousse/i.test([x.type, x.item, x.bottle, x.pour].join(" ")));
-  const GRAPEFRUIT = "Contains grapefruit, which can interfere with a wide range of medications.";
+  // Health notes shown under a drink, keyed off its ingredients.
+  // Grapefruit (juice, soda, liqueur) interacts with many medications; raw egg carries a salmonella risk.
+  const ADVISORIES = [
+    [/grapefruit|pamplemousse/i, "Contains grapefruit, which can interfere with a wide range of medications."],
+    [/^(egg white|egg yolk|whole egg)$/i, "Contains raw egg, which carries a small risk of foodborne illness. Ask for it without if you're pregnant or have a weakened immune system."],
+  ];
+  const advisoriesHTML = (d) => {
+    const ings = ingsOf(d).map((x) => [x.type, x.item, x.bottle, x.pour]);
+    return ADVISORIES.filter(([re]) => ings.some((parts) => parts.some((p) => re.test(String(p || "").trim()))))
+      .map(([, text]) => `<p class="advisory">${text}</p>`).join("");
+  };
   const ingsOf = (d) => REC[d.name] || ingredients(d.ingredients);
   // What the sheet's Status column says we'd have to buy for a drink.
   const missingOf = (d) => [...new Set((REC[d.name] || []).filter((x) => x.status === "Buy").map((x) => x.pour || x.bottle || x.type))];
@@ -106,7 +115,7 @@
       ${d.description ? `<p class="dd">${esc(d.description)}</p>` : ""}
       <p class="di">${ings.map(ingHTML).join('<span class="sep">·</span>')}</p>
       ${miss.length ? giftLine(miss) : ""}
-      ${hasGrapefruit(d) ? `<p class="advisory">${GRAPEFRUIT}</p>` : ""}
+      ${advisoriesHTML(d)}
       <p class="dm">${meta.map(esc).join(" · ")}${src && !house ? " · via " + esc(src) : ""}${photoUrl(d.photo_url) ? ' <span class="cam">◉ photo</span>' : ""}</p>
     </li>`;
   }
@@ -294,7 +303,7 @@
       ${d.description ? `<p class="dd">${esc(d.description)}</p>` : ""}
       <table class="spec">${ingsOf(d).map((x) => `<tr><td class="amt">${esc(x.amt)}</td><td>${esc(ingName(x))}${guestNote(x.note) ? `<span class="inote">, ${esc(guestNote(x.note))}</span>` : ""}${x.status === "Sub" && x.pour ? ` <span class="tag sub">subbed with ${esc(fullName(x.pour))}</span>` : ""}${x.status === "Buy" ? ' <span class="tag miss">missing</span>' : ""}</td></tr>`).join("")}</table>
       ${missingOf(d).length ? giftLine(missingOf(d)) : ""}
-      ${hasGrapefruit(d) ? `<p class="advisory">${GRAPEFRUIT}</p>` : ""}
+      ${advisoriesHTML(d)}
       ${d.instructions ? `<p class="instr">${esc(d.instructions)}</p>` : ""}
       ${facts.length ? `<dl class="facts">${facts.map((f) => `<dt>${f[0]}</dt><dd>${esc(f[1])}</dd>`).join("")}</dl>` : ""}
       ${src ? `<p class="src">Recipe: ${d.source_url ? `<a href="${esc(d.source_url)}" target="_blank" rel="noopener">${esc(src)}</a>` : esc(src)}</p>` : ""}</div>`;
