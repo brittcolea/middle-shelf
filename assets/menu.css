@@ -116,8 +116,12 @@ button { font: inherit; color: inherit; }
 .dm { margin: 4px 0 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .dm .cam { color: var(--gold); letter-spacing: 0; }
 @media (min-width: 620px) {
-  .drink { grid-template-columns: minmax(170px, 36%) 1fr; align-items: baseline; }
-  .dn { grid-row: span 4; }
+  /* Name on the left; everything else (however many notes a drink has) stacks on the right. */
+  .drink { grid-template-columns: minmax(170px, 36%) 1fr; align-items: baseline; row-gap: 0; }
+  .drink > .dn { grid-column: 1; grid-row: 1 / span 8; }
+  .drink > :not(.dn) { grid-column: 2; }
+  .drink > .dd, .drink > .di { margin-top: 3px; }
+  .drink > .dd:first-of-type { margin-top: 0; }
 }
 
 /* ---------- Cover ---------- */
